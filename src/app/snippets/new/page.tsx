@@ -1,30 +1,23 @@
-"use client";
-import { createSnippet } from "./createSnippet";
+import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { useState, useEffect } from "react";
 
-interface Snippet {
-  id: number;
-  title: string;
-  code: string;
-  createdAt: Date;
-}
+export default function NewSnippetPage() {
+  async function createSnippet(formData: FormData) {
+    //This need to be server action
+    "use server";
 
-export default function NewSnippetPage({
-  initialSnippets,
-}: {
-  initialSnippets: Snippet[];
-}) {
-  const [snippets, setSnippets] = useState<Snippet[]>(initialSnippets);
+    //Check the user's inputs and make sure they are valid
 
-  useEffect(() => {
-    const fetchSnippets = async () => {
-      const allSnippets = await db.snippet.findMany();
-      setSnippets(allSnippets);
-    };
+    const title = formData.get("title") as string;
+    const code = formData.get("code") as string;
+    // Create a new record in the database
+    const snippet = await db.snippet.create({
+      data: { title, code },
+    });
 
-    fetchSnippets();
-  }, []);
+    // Redirect the user to the root page
+    redirect("/");
+  }
 
   return (
     <div>
@@ -56,20 +49,6 @@ export default function NewSnippetPage({
           </button>
         </div>
       </form>
-      {snippets.map((snippet) => (
-        <div key={snippet.id} className="border m-4 p-4">
-          <h2 className="text-gray-800">{snippet.title}</h2>
-          <pre className="bg-gray-200 p-4">{snippet.code}</pre>
-          <h4 className="text-gray-900">
-            {snippet.createdAt.toLocaleString()}
-          </h4>
-        </div>
-      ))}
     </div>
   );
-}
-
-export async function getServerSideProps() {
-  const snippets = await db.snippet.findMany();
-  return { props: { initialSnippets: snippets } };
 }
