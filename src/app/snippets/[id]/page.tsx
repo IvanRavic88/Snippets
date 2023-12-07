@@ -1,9 +1,8 @@
 import { db } from "@/db";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { deleteSnippet } from "@/actions";
 
 import Link from "next/link";
-import { startTransition } from "react";
 
 interface SnippetShowPageProps {
   params: {
