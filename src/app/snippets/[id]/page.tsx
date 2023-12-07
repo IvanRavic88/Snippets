@@ -1,13 +1,15 @@
 import { db } from "@/db";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { deleteSnippet } from "@/actions";
+
+import Link from "next/link";
+import { startTransition } from "react";
 
 interface SnippetShowPageProps {
   params: {
     id: string;
   };
 }
-import Link from "next/link";
-
 export default async function SnippetShowPage(props: SnippetShowPageProps) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -18,6 +20,8 @@ export default async function SnippetShowPage(props: SnippetShowPageProps) {
   if (!snippet) {
     return notFound();
   }
+
+  const deleteSnippetAction = deleteSnippet.bind(null, snippet.id);
 
   return (
     <div className="bg-gray-900 p-5">
@@ -30,9 +34,11 @@ export default async function SnippetShowPage(props: SnippetShowPageProps) {
           >
             Edit
           </Link>
-          <button className="px-4 py-2 border border-gray-600 rounded text-gray-300 bg-gray-700 hover:bg-gray-600">
-            Delete
-          </button>
+          <form action={deleteSnippetAction}>
+            <button className="px-4 py-2 border border-gray-600 rounded text-gray-300 bg-red-500 hover:bg-red-600">
+              Delete
+            </button>
+          </form>
         </div>
       </div>
       <pre className="p-3 border border-gray-600 rounded bg-gray-700 mt-5 shadow-lg">
