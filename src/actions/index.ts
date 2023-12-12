@@ -19,16 +19,41 @@ export async function createSnippet(
   formState: { message: string },
   formData: FormData
 ) {
-  return "Title must be longer";
-  // //Check the user's inputs and make sure they are valid
+  //Check the user's inputs and make sure they are valid
+  try {
+    const title = formData.get("title");
+    const code = formData.get("code");
 
-  // const title = formData.get("title") as string;
-  // const code = formData.get("code") as string;
-  // // Create a new record in the database
-  // const snippet = await db.snippet.create({
-  //   data: { title, code },
-  // });
+    if (typeof title !== "string" || title.length <= 3) {
+      return {
+        message: "Please provide a title that is at least 3 characters long",
+      };
+    }
 
-  // // Redirect the user to the root page
-  // redirect("/");
+    if (typeof code !== "string" || code.length <= 10) {
+      return {
+        message: "Please provide a code that is at least 10 characters long",
+      };
+    }
+
+    // Create a new record in the database
+    await db.snippet.create({
+      data: {
+        title,
+        code,
+      },
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        message: error.message,
+      };
+    } else {
+      return {
+        message: "Unknown error",
+      };
+    }
+  }
+  // Redirect the user to the root page
+  redirect("/");
 }
